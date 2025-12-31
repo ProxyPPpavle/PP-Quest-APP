@@ -62,7 +62,7 @@ const AuthScreen = ({ onLogin }: { onLogin: (u: string) => void }) => {
           </button>
         </form>
 
-        <p className="text-center text-slate-600 text-[10px] font-bold uppercase tracking-widest">v1.0.2 Stable Release</p>
+        <p className="text-center text-slate-600 text-[10px] font-bold uppercase tracking-widest">v1.0.3 Stable Release</p>
       </div>
     </div>
   );
@@ -169,6 +169,11 @@ const App: React.FC = () => {
 
   const progressPercent = `${Math.min(100, Math.max(0, (state.stats.xp / 500) * 100))}%`;
 
+  // Detect if current quests match current UI language (simple heuristic)
+  const needsManualRefresh = state.activeQuests.length > 0 && 
+    ((state.user.language === 'sr' && /^[a-zA-Z\s\?]+$/.test(state.activeQuests[0].title)) || 
+     (state.user.language === 'en' && /[đžćčš]/i.test(state.activeQuests[0].title)));
+
   return (
     <div className={`min-h-screen max-w-lg mx-auto pb-32 flex flex-col transition-all duration-700 relative overflow-x-hidden ${state.user.theme === 'dark' ? 'bg-slate-950 text-white' : 'bg-slate-50 text-slate-900'}`}>
       
@@ -232,8 +237,8 @@ const App: React.FC = () => {
               </button>
             </div>
 
-            {state.activeQuests.length > 0 && !loading && (
-              <div className="bg-indigo-500/10 p-4 rounded-2xl border border-indigo-500/20 text-center">
+            {needsManualRefresh && !loading && (
+              <div className="bg-indigo-500/10 p-4 rounded-2xl border border-indigo-500/20 text-center animate-pulse">
                 <p className="text-[10px] font-bold text-indigo-300 italic">{t.lang_refresh}</p>
               </div>
             )}

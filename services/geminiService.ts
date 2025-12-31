@@ -2,10 +2,8 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { Quest, Language } from "../types";
 
-// Initialize the Gemini AI client using the environment variable API_KEY directly as per guidelines.
-const ai = new GoogleGenAI({
-  apiKey: import.meta.env.VITE_GEMINI_API_KEY
-});
+// Always use named parameter for apiKey and obtain it from process.env.API_KEY directly.
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 const QUEST_SCHEMA = {
   type: Type.ARRAY,
@@ -30,13 +28,13 @@ const QUEST_SCHEMA = {
 };
 
 export async function generateDailyQuests(lang: Language): Promise<Quest[]> {
-  // Fix: Removed 'es' and 'fr' as they are not defined in the Language type.
   const langNames: Record<Language, string> = { en: 'English', sr: 'Serbian' };
   const prompt = `Generate 4 creative 'Side Quests' for a mobile app. 
   LANGUAGE: ${langNames[lang]}.
   
   TYPES TO MIX: QUIZ, IMAGE, TEXT, LOCATION, ONLINE_IMAGE.
   RULES:
+  - Use the requested language (${langNames[lang]}) for ALL text fields.
   - DO NOT make all 4 the same. Max 2 of any specific type.
   - For ONLINE_IMAGE: Instructions must ask user to find a specific image on the internet (e.g. "Find a meme of a cat in a hat", "Find a picture of a 1920s car").
   - For QUIZ: Provide EXACTLY 3 funny and relevant options.
@@ -74,7 +72,6 @@ export async function verifyQuestWithAI(
   lang: Language
 ): Promise<{ success: boolean; feedback: string }> {
   const model = 'gemini-3-flash-preview';
-  // Fix: Removed 'es' and 'fr' as they are not defined in the Language type.
   const langNames: Record<Language, string> = { en: 'English', sr: 'Serbian' };
   
   const typeRules = {
