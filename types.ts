@@ -3,15 +3,23 @@ export type QuestDifficulty = 'EASY' | 'MEDIUM' | 'HARD' | 'MEME' | 'IMPOSSIBLE'
 
 export type QuestType = 'TEXT' | 'IMAGE' | 'LOCATION' | 'QUIZ' | 'LOGIC' | 'ONLINE_IMAGE';
 
-export interface Quest {
-  id: string;
+export interface QuestContent {
   title: string;
   description: string;
+  instructions: string;
+}
+
+export interface Quest {
+  id: string;
   difficulty: QuestDifficulty;
   type: QuestType;
   points: number;
-  instructions: string;
   createdAt: number;
+  // Multi-language support
+  localized: {
+    en: QuestContent;
+    sr: QuestContent;
+  };
   quizOptions?: string[];
   correctAnswer?: string;
   location?: {
@@ -30,13 +38,11 @@ export interface UserStats {
   totalPoints: number;
   xp: number;
   level: number;
-  // Counters for difficulties
   easyCount: number;
   mediumCount: number;
   hardCount: number;
   memeCount: number;
   impossibleCount: number;
-  // Achievement system
   badges: string[];
   typeCounts: Record<string, number>;
 }

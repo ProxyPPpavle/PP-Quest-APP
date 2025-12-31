@@ -1,3 +1,4 @@
+
 import React, { useState, useRef } from 'react';
 import { Quest, Language } from '../types';
 import { verifyQuestWithAI } from '../services/geminiService';
@@ -21,6 +22,7 @@ const CompletionModal: React.FC<CompletionModalProps> = ({ quest, lang, onClose,
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const t = (translations as any)[lang] || translations.en;
+  const content = quest.localized[lang] || quest.localized.en;
 
   const handleVerify = async (type: 'IMAGE' | 'TEXT' | 'LOCATION' | 'ONLINE_IMAGE') => {
     setLoading(true);
@@ -88,8 +90,8 @@ const CompletionModal: React.FC<CompletionModalProps> = ({ quest, lang, onClose,
             </div>
             
             <div className="mb-5 p-4 bg-indigo-500/10 rounded-2xl border border-indigo-500/20">
-              <h3 className="font-bold text-indigo-400 mb-1 text-sm leading-tight">{quest.title}</h3>
-              <p className="text-slate-300 text-[11px] italic leading-relaxed">{quest.instructions}</p>
+              <h3 className="font-bold text-indigo-400 mb-1 text-sm leading-tight">{content.title}</h3>
+              <p className="text-slate-300 text-[11px] italic leading-relaxed">{content.instructions}</p>
             </div>
 
             {(quest.type === 'IMAGE' || quest.type === 'ONLINE_IMAGE') && (

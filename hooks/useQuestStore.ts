@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { AppState, Quest, QuestCompletion, UserStats, Language } from '../types';
 import { generateDailyQuests } from '../services/geminiService';
 
@@ -27,7 +27,7 @@ const INITIAL_STATE: AppState = {
     username: null,
     isLoggedIn: false,
     isPremium: false,
-    refreshesLeft: 2,
+    refreshesLeft: 1,
     language: 'en',
     theme: 'dark'
   },
@@ -46,9 +46,13 @@ export function useQuestStore() {
 
   const [loading, setLoading] = useState(false);
   const [newBadges, setNewBadges] = useState<string[]>([]);
+  
+  // Use a ref to always have the latest language for async calls
+  const languageRef = useRef(state.user.language);
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    languageRef.current = state.user.language;
   }, [state]);
 
   const login = (username: string) => {
@@ -67,23 +71,37 @@ export function useQuestStore() {
     }));
   };
 
-  const refreshQuests = useCallback(async (isAuto = false) => {
+  const refreshQuests = useCallback(async (isAuto = false, targetLang?: Language) => {
     if (loading) return;
     setLoading(true);
+    const langToUse = targetLang || languageRef.current;
     try {
-      const newQuests = await generateDailyQuests(state.user.language);
+      const newQuests = await generateDailyQuests(langToUse);
       setState(prev => ({
         ...prev,
         activeQuests: newQuests,
         lastRefresh: Date.now(),
-        user: { ...prev.user, refreshesLeft: isAuto ? prev.user.refreshesLeft : Math.max(0, prev.user.refreshesLeft - 1) }
+        user: { 
+          ...prev.user, 
+          refreshesLeft: isAuto ? prev.user.refreshesLeft : Math.max(0, prev.user.refreshesLeft - 1),
+          language: langToUse 
+        }
       }));
     } catch (e) {
       console.error(e);
     } finally {
       setLoading(false);
     }
-  }, [state.user.language, state.user.refreshesLeft, loading]);
+  }, [loading]);
+
+  const updateSetting = (key: string, value: any) => {
+    setState(prev => {
+      return {
+        ...prev,
+        user: { ...prev.user, [key]: value }
+      };
+    });
+  };
 
   const completeQuest = useCallback((questId: string, proof: string, aiResponse: string, duration: number) => {
     setState(prev => {
@@ -128,7 +146,6 @@ export function useQuestStore() {
         typeCounts: updatedTypeCounts
       };
 
-      // Check for badges
       const oldBadges = prev.stats.badges || [];
       const currentBadges = [...oldBadges];
       const hour = new Date().getHours();
@@ -194,8 +211,24 @@ export function useQuestStore() {
       const updated = prev.completedQuests.map(c => 
         c.questId === questId ? { ...c, saved: !c.saved } : c
       );
-      const vaultCount = updated.filter(u => u.saved).length;
-      const oldBadges = prev.stats.badges || [];
-      const currentBadges = [...oldBadges];
-      
-      if (vaultCount >= 10
+      return { ...prev, completedQuests: updated };
+    });
+  };
+
+  const clearNewBadges = () => setNewBadges([]);
+
+  return { 
+    state, 
+    loading, 
+    refreshQuests, 
+    completeQuest, 
+    failQuest, 
+    toggleSave, 
+    updateSetting, 
+    login, 
+    logout, 
+    newBadges, 
+    clearNewBadges,
+    addExtraRefresh 
+  };
+}
