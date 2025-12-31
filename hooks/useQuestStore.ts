@@ -60,6 +60,13 @@ export function useQuestStore() {
     window.location.reload();
   };
 
+  const addExtraRefresh = () => {
+    setState(prev => ({
+      ...prev,
+      user: { ...prev.user, refreshesLeft: prev.user.refreshesLeft + 1 }
+    }));
+  };
+
   const refreshQuests = useCallback(async (isAuto = false) => {
     if (loading) return;
     setLoading(true);
@@ -191,24 +198,4 @@ export function useQuestStore() {
       const oldBadges = prev.stats.badges || [];
       const currentBadges = [...oldBadges];
       
-      if (vaultCount >= 10 && !currentBadges.includes('badge_vault')) {
-        currentBadges.push('badge_vault');
-        setNewBadges(p => [...p, 'badge_vault']);
-      }
-      
-      return {
-        ...prev,
-        completedQuests: updated,
-        stats: { ...prev.stats, badges: currentBadges }
-      };
-    });
-  };
-
-  const updateSetting = (key: string, value: any) => {
-    setState(prev => ({ ...prev, user: { ...prev.user, [key]: value } }));
-  };
-
-  const clearNewBadges = () => setNewBadges([]);
-
-  return { state, loading, refreshQuests, completeQuest, failQuest, toggleSave, updateSetting, login, logout, newBadges, clearNewBadges };
-}
+      if (vaultCount >= 10
