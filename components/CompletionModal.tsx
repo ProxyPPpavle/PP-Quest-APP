@@ -22,7 +22,10 @@ const CompletionModal: React.FC<CompletionModalProps> = ({ quest, lang, onClose,
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const t = (translations as any)[lang] || translations.en;
-  const content = quest.localized[lang] || quest.localized.en;
+  
+  // Safe access with fallbacks
+  const localized = quest.localized || { en: { title: 'Untitled', description: '', instructions: '' }, sr: { title: 'Bez Naslova', description: '', instructions: '' } };
+  const content = localized[lang] || localized.en;
 
   const handleVerify = async (type: 'IMAGE' | 'TEXT' | 'LOCATION' | 'ONLINE_IMAGE') => {
     setLoading(true);

@@ -29,7 +29,10 @@ const TYPE_CONFIG: Record<QuestType, { icon: string, color: string, gradient: st
 };
 
 const QuestCard: React.FC<QuestCardProps> = ({ quest, onClick, lang, isCompleted, onSave, isSaved }) => {
-  const content = quest.localized[lang] || quest.localized.en;
+  // Safe access with fallbacks to prevent "Cannot read properties of undefined (reading 'en')"
+  const localized = quest.localized || { en: { title: 'Untitled', description: '', instructions: '' }, sr: { title: 'Bez Naslova', description: '', instructions: '' } };
+  const content = localized[lang] || localized.en;
+  
   const config = TYPE_CONFIG[quest.type] || { icon: '⚡', color: 'border-slate-500/40', gradient: 'from-slate-500/10 to-transparent' };
   const [shareStatus, setShareStatus] = useState<'IDLE' | 'COPIED' | 'ERROR'>('IDLE');
 

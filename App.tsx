@@ -263,7 +263,7 @@ const App: React.FC = () => {
               <div className="flex flex-col gap-4">
                 {state.activeQuests.slice(0, 2).map(q => <QuestCard key={q.id} quest={q} lang={state.user.language} onClick={setSelectedQuest} />)}
                 
-                {/* Mid Placement: Small Banner (Visible one) */}
+                {/* 🎯 Middle: Small Banner (320x50 - Most visible on mobile) */}
                 <AdsterraAd id={ADS_CONFIG.BANNER_SMALL} type="banner_small" />
                 
                 {state.activeQuests.slice(2).map(q => <QuestCard key={q.id} quest={q} lang={state.user.language} onClick={setSelectedQuest} />)}
@@ -287,7 +287,7 @@ const App: React.FC = () => {
                   </div>
                 )}
                 
-                {/* Footer Placement: Big Banner (Invisible one as footer) */}
+                {/* 🎯 Footer: Big Banner (468x60) */}
                 <AdsterraAd id={ADS_CONFIG.BANNER_BIG} type="banner" />
               </div>
             )}
@@ -304,7 +304,7 @@ const App: React.FC = () => {
               <StatBox label={t.total_xp} value={state.stats.totalPoints} color="bg-amber-500/5" border="border-amber-500/20" textColor="text-amber-400" icon="💎" />
             </div>
 
-            {/* Mid Placement: Small Banner */}
+            {/* 🎯 Middle: Small Banner */}
             <AdsterraAd id={ADS_CONFIG.BANNER_SMALL} type="banner_small" />
 
             <div className="space-y-3 mb-6">
@@ -333,14 +333,14 @@ const App: React.FC = () => {
                </div>
             </div>
             
-            {/* Footer Placement: Big Banner */}
+            {/* 🎯 Footer: Big Banner */}
             <AdsterraAd id={ADS_CONFIG.BANNER_BIG} type="banner" />
           </div>
         )}
 
         {activeTab === 'SAVED' && (
           <div className="animate-in fade-in duration-300">
-            {/* Header Area Placement: Small Banner */}
+            {/* 🎯 Top/Header: Small Banner */}
             <AdsterraAd id={ADS_CONFIG.BANNER_SMALL} type="banner_small" />
 
             <h2 className="text-lg font-fun font-black text-white px-1 uppercase leading-none mb-4">{t.saved}</h2>
@@ -362,7 +362,7 @@ const App: React.FC = () => {
               </div>
             )}
             
-            {/* Footer Area Placement: Big Banner */}
+            {/* 🎯 Footer: Big Banner */}
             <AdsterraAd id={ADS_CONFIG.BANNER_BIG} type="banner" />
           </div>
         )}

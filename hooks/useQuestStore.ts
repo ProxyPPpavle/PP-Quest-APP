@@ -40,14 +40,31 @@ const INITIAL_STATE: AppState = {
 export function useQuestStore() {
   const [state, setState] = useState<AppState>(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) return JSON.parse(saved);
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        // Validation: Ensure quests have the 'localized' property introduced in the latest version
+        const hasLocalized = (parsed.activeQuests || []).every((q: any) => q.localized) && 
+                             (parsed.completedQuests || []).every((c: any) => c.questData?.localized);
+        
+        if (hasLocalized) return parsed;
+        
+        // If data is old/malformed, return initial state but try to keep user profile
+        return { 
+          ...INITIAL_STATE, 
+          user: parsed.user || INITIAL_STATE.user,
+          stats: parsed.stats || INITIAL_STATE.stats
+        };
+      } catch (e) {
+        return INITIAL_STATE;
+      }
+    }
     return INITIAL_STATE;
   });
 
   const [loading, setLoading] = useState(false);
   const [newBadges, setNewBadges] = useState<string[]>([]);
   
-  // Use a ref to always have the latest language for async calls
   const languageRef = useRef(state.user.language);
 
   useEffect(() => {
